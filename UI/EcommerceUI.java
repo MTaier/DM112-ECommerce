@@ -1,10 +1,19 @@
 package UI;
 
-import models.*;
-import payments.*;
-import controllers.*;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.FlowLayout;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
+import controllers.PedidoController;
+import models.Produto;
 
 public class EcommerceUI extends JFrame {
     private PedidoController pedidoController;
@@ -54,20 +63,24 @@ public class EcommerceUI extends JFrame {
             atualizarCarrinho();
         });
 
-        btnFinalizar.addActionListener(e -> {
-            if (!rbCartao.isSelected() && !rbPix.isSelected()) {
-                JOptionPane.showMessageDialog(null, "Selecione um método de pagamento");
-                return;
-            }
-            String metodoPagamento = rbCartao.isSelected() ? "Cartão" : "Pix";
-            Pagamento pagamento = PagamentoFactory.criarPagamento(metodoPagamento, "1234-5678-9012-3456");
-            pedidoController.finalizarPedido(pagamento);
-            carrinhoTextArea.setText("Pedido finalizado!");
-        });
+        btnFinalizar.addActionListener(e -> abrirJanelaPagamento());
     }
 
     private void atualizarCarrinho() {
         carrinhoTextArea.setText(pedidoController.visualizarCarrinho());
+    }
+
+    private void abrirJanelaPagamento() {
+        if (!rbCartao.isSelected() && !rbPix.isSelected()) {
+            JOptionPane.showMessageDialog(null, "Selecione um método de pagamento");
+            return;
+        }
+
+        if (rbCartao.isSelected()) {
+            new PagamentoCartaoUI(pedidoController).setVisible(true);
+        } else if (rbPix.isSelected()) {
+            new PagamentoPixUI(pedidoController).setVisible(true);
+        }
     }
 
     public static void main(String[] args) {
